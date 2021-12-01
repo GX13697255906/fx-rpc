@@ -1,0 +1,9 @@
+
+# 应用名称
+spring:
+  application:
+    name: fx-rpc-client
+
+server:
+  port: 8080
+
