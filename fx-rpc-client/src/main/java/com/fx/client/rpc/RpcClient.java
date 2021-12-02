@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Administrator
@@ -69,11 +70,35 @@ public class RpcClient {
         return bootstrap;
     }
 
-    public RpcResponse pushRpcRequest(RpcRequest rpcRequest) {
+    public void connect() {
         try {
             future = bootstrap.connect(HOST, RpcConstants.PORT).sync();
-            Channel channel = future.channel();
-            channel.writeAndFlush(rpcRequest).sync();
+            System.out.println(future.isSuccess());
+            future.addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture channelFuture) throws Exception {
+                    if (!future.isSuccess()) {
+                        log.warn("Failed to connect to server, try connect after {}s", 5);
+                        channelFuture.channel().eventLoop().schedule(new Runnable() {
+                            @Override
+                            public void run() {
+                                connect();
+                            }
+                        }, 5, TimeUnit.SECONDS);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public RpcResponse pushRpcRequest(RpcRequest rpcRequest) {
+
+        connect();
+        Channel channel = future.channel();
+        try {
+            channel.writeAndFlush(rpcRequest);
 //            同步阻塞 通过监听channel实现同步
             channel.closeFuture().sync();
         } catch (Exception e) {

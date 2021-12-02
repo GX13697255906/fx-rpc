@@ -64,10 +64,10 @@ public class RpcServer {
                     }
                 });
         try {
-            channelFuture = bootstrap.bind(RpcConstants.PORT).sync();
+            channelFuture = bootstrap.bind(RpcConstants.PORT);
 //            // 监听服务端关闭，并阻塞等待
-            channelFuture.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
+//            channelFuture.channel().closeFuture().sync();
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
 //            bossGroup.shutdownGracefully();

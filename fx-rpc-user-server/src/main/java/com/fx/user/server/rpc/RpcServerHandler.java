@@ -29,7 +29,7 @@ public class RpcServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         RpcRequest rpcRequest = (RpcRequest) msg;
         RpcResponse response = ResultUtils.getRpcResponse(rpcRequest);
-        log.info("response = {}", JSONObject.toJSONString(response));
+        log.info("server response = {}", JSONObject.toJSONString(response));
         ctx.writeAndFlush(response);
         ctx.close();
     }
